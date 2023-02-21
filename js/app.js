@@ -91,7 +91,7 @@ function handleShowResults()
     for(let i = 0; i < productArray.length; i++)
     {
       let prodListItem = document.createElement('li');
-      prodListItem.textcontent = `${productArray[i].name}: View: ${productArray[i].views} & Votes: ${productArray[i].votes}`;
+      prodListItem.textContent = `${productArray[i].name}: View: ${productArray[i].views} & Votes: ${productArray[i].votes}`;
       resultList.appendChild(prodListItem);
     }
     resultsBtn.removeEventListener('click', handleShowResults);
