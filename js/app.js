@@ -14,34 +14,51 @@ let imgOne = document.getElementById('img-one');
 let imgTwo = document.getElementById('img-two');
 let imgThree = document.getElementById('img-three');
 let resultsBtn = document.getElementById('show-results-btn');
-let resultList = document.getElementById('results-container');
+//let resultList = document.getElementById('results-container');
+
+//*************CANVAS ELEMENT FOR CHART ************
+let ctx = document.getElementById('my-chart');
 
 
 /******** CONSTRUCTOR FUNCTION *******/
-function ProductObj(name, fileExtension = 'jpg')
-{
+function ProductObj(name, fileExtension = 'jpg') {
   this.name = name;
   this.image = `img/${name}.${fileExtension}`;
   this.votes = 0;
   this.views = 0;
 }
 
-
+let indexArray = [];
 
 /*********HELPER FUNCTIONS *********/
-function renderImages()
-{
-  let imgOneIndex = randomIndex();
-  let imgTwoIndex = randomIndex();
-  let imgThreeIndex = randomIndex();
+function renderImages() {
+  
 
-  //IMAGES HAVE TO BE UNIQUE
-  while (imgTwoIndex === imgOneIndex) {
-    imgTwoIndex = randomIndex();
+
+  while(indexArray.length < 6)
+  {
+    let randomNum = randomIndex();
+    if(!indexArray.includes(randomNum))
+    {
+      indexArray.push(randomNum);
+    }
   }
-  while (imgThreeIndex === imgOneIndex || imgThreeIndex === imgTwoIndex) {
-    imgThreeIndex = randomIndex();
-  }
+
+  console.log(indexArray);
+  let imgOneIndex = indexArray.shift();
+  let imgTwoIndex = indexArray.shift();
+  let imgThreeIndex = indexArray.shift();
+  // let imgOneIndex = randomIndex();
+  // let imgTwoIndex = randomIndex();
+  // let imgThreeIndex = randomIndex();
+
+  // //IMAGES HAVE TO BE UNIQUE
+  // while (imgTwoIndex === imgOneIndex) {
+  //   imgTwoIndex = randomIndex();
+  // }
+  // while (imgThreeIndex === imgOneIndex || imgThreeIndex === imgTwoIndex) {
+  //   imgThreeIndex = randomIndex();
+  // }
 
   imgOne.src = productArray[imgOneIndex].image;
   imgOne.title = productArray[imgOneIndex].name;
@@ -59,48 +76,83 @@ function renderImages()
 
 }
 
-function randomIndex()
-{
+/*********************RENDER CHART ***********************/
+
+
+function renderChart() {
+
+  let prodNames = [];
+  let prodVotes = [];
+  let prodViews = [];
+
+  for(let i = 0; i < productArray.length; i++)
+  {
+    prodNames.push(productArray[i].name);
+    prodVotes.push(productArray[i].votes);
+    prodViews.push(productArray[i].views);
+  }
+
+  let chartObj = {
+    type: 'bar',
+    data: {
+      labels: prodNames,
+      datasets: [{
+        label: '# of Votes',
+        data: prodVotes,
+        borderWidth: 2,
+        backgroundColor: ['blue'],
+        borderColor: ['black']
+      },
+      {
+        label: '# of Views',
+        data: prodViews,
+        borderWidth: 2,
+        backgroundColor: ['red'],
+        borderColor: ['black']
+      },
+      ]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: false
+        }
+      }
+    }
+  };
+  new Chart(ctx, chartObj);
+}
+
+function randomIndex() {
   return Math.floor(Math.random() * productArray.length);
 }
 
-function handleImageClick(event)
-{
+function handleImageClick(event) {
   let imgClicked = event.target.title;
 
-  for (let i = 0; i < productArray.length; i++)
-  {
-    if(imgClicked === productArray[i].name)
-    {
+  for (let i = 0; i < productArray.length; i++) {
+    if (imgClicked === productArray[i].name) {
       productArray[i].votes++;
     }
   }
   votingRounds--;
   renderImages();
 
-  if(votingRounds === 0)
-  {
+  if (votingRounds === 0) {
     imgContainer.removeEventListener('click', handleImageClick);
   }
 }
 
-function handleShowResults()
-{
-  if(votingRounds === 0)
-  {
-    for(let i = 0; i < productArray.length; i++)
-    {
-      let prodListItem = document.createElement('li');
-      prodListItem.textContent = `${productArray[i].name}: View: ${productArray[i].views} & Votes: ${productArray[i].votes}`;
-      resultList.appendChild(prodListItem);
-    }
+function handleShowResults() {
+  if (votingRounds === 0) {
+    renderChart();
     resultsBtn.removeEventListener('click', handleShowResults);
   }
 }
 
 /******* EXECUTABLE CODE ********/
 
-let sweep = new ProductObj('sweep','png');
+let sweep = new ProductObj('sweep', 'png');
 let bag = new ProductObj('bag');
 let banana = new ProductObj('banana');
 let bathroom = new ProductObj('bathroom');
